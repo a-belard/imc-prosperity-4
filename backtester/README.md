@@ -26,10 +26,16 @@ Quick run:
 prosperity4mcbt ../example_trader.py --quick --out ../tmp/example/dashboard.json
 ```
 
-Default heavy run:
+Default run:
 
 ```bash
 prosperity4mcbt ../example_trader.py --out ../tmp/example/dashboard.json
+```
+
+Heavy run:
+
+```bash
+prosperity4mcbt ../example_trader.py --heavy --out ../tmp/example/dashboard.json
 ```
 
 Open the dashboard locally:

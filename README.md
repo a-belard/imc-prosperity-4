@@ -15,8 +15,8 @@ You do not need to rewrite your trader for Monte Carlo mode. If your file alread
 
 - Tutorial-round products: `EMERALDS`, `TOMATOES`
 - One-day Monte Carlo sessions: `10,000` steps per session
-- Default heavy run: `1000` sessions, `100` saved path traces
-- Quick preset: `100` sessions, `10` saved path traces
+- Default run: `100` sessions, `10` saved path traces
+- Heavy preset: `1000` sessions, `100` saved path traces
 - Local Monte Carlo dashboard
 - Historical replay through the legacy compatibility CLI
 
@@ -50,11 +50,18 @@ source backtester/.venv/bin/activate
 prosperity4mcbt your_trader.py --quick --out tmp/your_run/dashboard.json
 ```
 
-Run the default heavy sweep:
+Run the default sweep:
 
 ```bash
 source backtester/.venv/bin/activate
 prosperity4mcbt your_trader.py --out tmp/your_run/dashboard.json
+```
+
+Run the heavy sweep:
+
+```bash
+source backtester/.venv/bin/activate
+prosperity4mcbt your_trader.py --heavy --out tmp/your_run/dashboard.json
 ```
 
 Start the visualizer:
@@ -94,6 +101,9 @@ prosperity4mcbt example_trader.py --quick --out tmp/example/dashboard.json
 
 `prosperity4mcbt` supports two useful presets:
 
+- default
+  - `100` sessions
+  - `10` sample sessions
 - `--quick`
   - `100` sessions
   - `10` sample sessions
@@ -101,7 +111,7 @@ prosperity4mcbt example_trader.py --quick --out tmp/example/dashboard.json
   - `1000` sessions
   - `100` sample sessions
 
-Default behavior is already the heavy configuration:
+Bare `prosperity4mcbt your_trader.py` now uses the quick-sized default:
 
 ```bash
 prosperity4mcbt your_trader.py

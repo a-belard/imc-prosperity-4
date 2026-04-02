@@ -64,7 +64,7 @@ def cli(
         bool,
         Option("--heavy", help="Preset for a full run: 1000 sessions and 100 sample sessions."),
     ] = False,
-    sessions: Annotated[int, Option("--sessions", help="Number of Monte Carlo sessions to run.")] = 1000,
+    sessions: Annotated[int, Option("--sessions", help="Number of Monte Carlo sessions to run.")] = 100,
     fv_mode: Annotated[str, Option("--fv-mode", help="Fair-value mode for the Rust simulator.")] = "simulate",
     trade_mode: Annotated[str, Option("--trade-mode", help="Trade-arrival mode for the Rust simulator.")] = "simulate",
     tomato_support: Annotated[str, Option("--tomato-support", help="Latent fair support for tomatoes in simulate mode.")] = "quarter",
@@ -76,7 +76,7 @@ def cli(
     sample_sessions: Annotated[
         int,
         Option("--sample-sessions", help="Number of sessions to persist with full path/trace data for dashboard charts."),
-    ] = 100,
+    ] = 10,
     version: Annotated[
         bool,
         Option("--version", "-v", help="Show the program's version number and exit.", is_eager=True, callback=version_callback),

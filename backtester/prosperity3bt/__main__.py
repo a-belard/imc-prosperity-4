@@ -261,13 +261,13 @@ def monte_carlo_cli(
     data: Annotated[Optional[Path], Option(help="Path to data directory. If it contains round0/, that round0 directory is used as the actual calibration source.", show_default=False, exists=True, file_okay=False, dir_okay=True, resolve_path=True)] = None,
     quick: Annotated[bool, Option("--quick", help="Preset for a fast run: 100 sessions and 10 sample sessions.")] = False,
     heavy: Annotated[bool, Option("--heavy", help="Preset for a full run: 1000 sessions and 100 sample sessions.")] = False,
-    sessions: Annotated[int, Option("--sessions", help="Number of Monte Carlo sessions to run.")] = 1000,
+    sessions: Annotated[int, Option("--sessions", help="Number of Monte Carlo sessions to run.")] = 100,
     fv_mode: Annotated[str, Option("--fv-mode", help="Fair-value mode for the Rust simulator.")] = "simulate",
     trade_mode: Annotated[str, Option("--trade-mode", help="Trade-arrival mode for the Rust simulator.")] = "simulate",
     tomato_support: Annotated[str, Option("--tomato-support", help="Latent fair support for tomatoes in simulate mode.")] = "quarter",
     seed: Annotated[int, Option("--seed", help="RNG seed for the Rust simulator.")] = 20260401,
     python_bin: Annotated[str, Option("--python-bin", help="Python interpreter used for the strategy worker process.")] = sys.executable,
-    sample_sessions: Annotated[int, Option("--sample-sessions", help="Number of sessions to persist with full path/trace data for dashboard charts.")] = 100,
+    sample_sessions: Annotated[int, Option("--sample-sessions", help="Number of sessions to persist with full path/trace data for dashboard charts.")] = 10,
 ) -> None:
     if no_out:
         print("Error: Monte Carlo mode always writes a dashboard bundle, so --no-out is not supported")
