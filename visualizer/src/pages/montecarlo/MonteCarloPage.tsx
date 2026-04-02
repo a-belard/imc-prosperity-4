@@ -41,6 +41,13 @@ type LocalDashboardStatus = {
   dashboardMtimeMs: number | null;
   dashboardSizeBytes: number | null;
   root: string;
+  currentRunId?: string | null;
+  runs?: Array<{
+    id: string;
+    label: string;
+    mtimeMs: number;
+    dashboardUrl: string;
+  }>;
 };
 
 export function MonteCarloPage(): ReactNode {
@@ -51,14 +58,26 @@ export function MonteCarloPage(): ReactNode {
   const [localDashboard, setLocalDashboard] = useState<MonteCarloDashboard | null>(null);
   const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
   const [dashboardVersion, setDashboardVersion] = useState<string | null>(null);
+  const [availableRuns, setAvailableRuns] = useState<
+    Array<{
+      id: string;
+      label: string;
+      mtimeMs: number;
+      dashboardUrl: string;
+    }>
+  >([]);
+  const [selectedRunId, setSelectedRunId] = useState<string>('latest');
   const [bandProduct, setBandProduct] = useState('TOMATOES');
   const searchParams = new URLSearchParams(search);
   const explicitOpenUrl = searchParams.get('open');
-  const localFallbackOpenUrl =
-    typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-      ? '/dashboard.json'
-      : null;
-  const localStatusUrl = localFallbackOpenUrl === null ? null : '/__prosperity4mcbt__/status.json';
+  const localMode = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const latestRun = availableRuns[0] ?? null;
+  const selectedRun =
+    selectedRunId === 'latest'
+      ? latestRun
+      : availableRuns.find(run => run.id === selectedRunId) ?? latestRun;
+  const localFallbackOpenUrl = localMode ? selectedRun?.dashboardUrl ?? '/dashboard.json' : null;
+  const localStatusUrl = localMode ? '/__prosperity4mcbt__/status.json' : null;
   const openUrl = explicitOpenUrl ?? localFallbackOpenUrl;
   const effectiveOpenUrl = openUrl === null ? null : withVersion(openUrl, explicitOpenUrl === null ? dashboardVersion : null);
   const dashboard = effectiveOpenUrl === null ? storedDashboard : loadedUrl === effectiveOpenUrl ? localDashboard : null;
@@ -84,11 +103,33 @@ export function MonteCarloPage(): ReactNode {
           return;
         }
 
+        const runs = response.data.runs ?? [];
+        setAvailableRuns(runs);
+
+        if (runs.length === 0) {
+          setSelectedRunId('latest');
+        } else {
+          setSelectedRunId(previous => {
+            if (previous === 'latest') {
+              return 'latest';
+            }
+            return runs.some(run => run.id === previous) ? previous : 'latest';
+          });
+        }
+
         if (!response.data.dashboardExists || response.data.dashboardMtimeMs === null) {
+          setLocalDashboard(null);
+          setLoadedUrl(null);
+          setDashboardVersion(null);
           return;
         }
 
-        const nextVersion = String(response.data.dashboardMtimeMs);
+        const currentRun =
+          response.data.currentRunId === undefined || response.data.currentRunId === null
+            ? runs[0]
+            : runs.find(run => run.id === response.data.currentRunId) ?? runs[0];
+        const selectedForVersion = selectedRunId === 'latest' ? currentRun : runs.find(run => run.id === selectedRunId) ?? currentRun;
+        const nextVersion = selectedForVersion === undefined ? String(response.data.dashboardMtimeMs) : String(selectedForVersion.mtimeMs);
         if (previousVersion !== nextVersion) {
           previousVersion = nextVersion;
           setDashboardVersion(nextVersion);
@@ -109,7 +150,7 @@ export function MonteCarloPage(): ReactNode {
       cancelled = true;
       window.clearInterval(interval);
     };
-  }, [explicitOpenUrl, localStatusUrl]);
+  }, [explicitOpenUrl, localStatusUrl, selectedRunId]);
 
   useEffect(() => {
     if (effectiveOpenUrl === null) {
@@ -245,7 +286,26 @@ export function MonteCarloPage(): ReactNode {
                 <Title order={2}>Monte Carlo Results</Title>
                 <Text c="dimmed">{strategyName}</Text>
               </div>
-              <Group gap="xs">
+              <Group gap="xs" align="flex-start">
+                {explicitOpenUrl === null && localMode && availableRuns.length > 0 && (
+                  <Select
+                    w={260}
+                    label="Run"
+                    value={selectedRunId}
+                    onChange={value => setSelectedRunId(value ?? 'latest')}
+                    allowDeselect={false}
+                    data={[
+                      {
+                        value: 'latest',
+                        label: `Latest (${latestRun?.label ?? 'none'})`,
+                      },
+                      ...availableRuns.map(run => ({
+                        value: run.id,
+                        label: run.label,
+                      })),
+                    ]}
+                  />
+                )}
                 <Badge variant="light">{dashboard.meta.sessionCount} sessions</Badge>
                 <Badge variant="light">{dashboard.meta.bandSessionCount ?? dashboard.meta.sampleSessions} path traces</Badge>
                 <Badge variant="light">{dashboard.meta.fvMode}</Badge>
