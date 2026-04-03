@@ -2,7 +2,6 @@
 .browser_session/
 .prosperity_token
 .prosperity_refresh
-.env.local
 CLAUDE.md
 AGENTS.md
 
@@ -47,3 +46,5 @@ bot_summary.md
 bot_3_maybe_informed.md
 .git_backup_*
 calibration/tomatoes/data/
+config.bat
+node_modules
